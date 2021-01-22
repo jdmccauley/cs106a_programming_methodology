@@ -4,15 +4,6 @@
  * This purpose of this program is to implement the game of Breakout.
  */
 
-/*
- * Decomposition:
- * 1. Make the bricks
- * 	Method
- * 	call in run() to initalize
- * 2. Make the paddle
- * 3. Make the ball
- * 4. Get the ball to bounce off walls
- */
 
 import acm.graphics.*;
 import acm.program.*;
@@ -25,9 +16,6 @@ import java.awt.event.*;
 public class Breakout extends GraphicsProgram {
 
 /** Width and height of application window in pixels */
-	
-	//For some reason these need to be public
-	//If private, window is too large
 	public static final int APPLICATION_WIDTH = 400;
 	public static final int APPLICATION_HEIGHT = 600;
 
@@ -86,11 +74,9 @@ public class Breakout extends GraphicsProgram {
 /** Time in milliseconds to delay ball movement */
 	public static final int BALL_PAUSE = 10;
 
-	/*
-	 * Making the bricks
-	 * 1. Make brick method
-	 * 2. Make row method, fill bricks
-	 */
+/** Number of bricks in the game */
+	private static final int NUM_BRICKS = NBRICK_ROWS * NBRICKS_PER_ROW;
+
 	
 	/**
 	 * Method: makeRect
@@ -104,6 +90,7 @@ public class Breakout extends GraphicsProgram {
 		rect.setFilled(true);
 		return rect;
 	}
+	
 	
 	/**
 	 * Method: makeColors
@@ -119,6 +106,7 @@ public class Breakout extends GraphicsProgram {
 		brickColors[4] = Color.CYAN;
 		return brickColors;
 	}
+	
 	
 	/**
 	 * Method: makeRow
@@ -138,6 +126,7 @@ public class Breakout extends GraphicsProgram {
 			x += BRICK_WIDTH + BRICK_SEP;
 		}
 	}
+	
 	
 	/**
 	 * Method: addRows
@@ -159,19 +148,61 @@ public class Breakout extends GraphicsProgram {
 	}
 	
 	
-	/* Instance variable */
+	/**
+	 * Method: getCollidingObject
+	 * Finds the closest GObject to the ball if the ball collides.
+	 * @param ball BreakoutBall ball: Ball for the breakout game, and is the collider
+	 * @return GObject GObject collider: the GObject that the ball collided with
+	 */
+	private GObject getCollidingObject(BreakoutBall ball) {
+		//Try for collisions. getElementAt is a public method within GraphicsProgram
+		//Note that reversing the x velocity makes the game loop through the same
+		//motions over an over. Too predictable.
+		double x = ball.getX();
+		double y = ball.getY();
+		if (getElementAt(x, y) != null
+				&& getElementAt(x, y) != paddle) {
+			bounceClip.play();
+			ball.setYVelocity(-ball.getYVelocity());
+			return getElementAt(x, y);
+		} else if (getElementAt(x + ball.ballDiam, y) != null 
+				&& getElementAt(x + ball.ballDiam, y) != paddle) {
+			bounceClip.play();
+			ball.setYVelocity(-ball.getYVelocity());
+			return getElementAt(x + ball.ballDiam, y);
+		} else if (getElementAt(x, y + ball.ballDiam) != null
+				&& getElementAt(x, y + ball.ballDiam) != paddle) {
+			bounceClip.play();
+			ball.setYVelocity(-ball.getYVelocity());
+			return getElementAt(x, y + ball.ballDiam);
+		} else if (getElementAt(x + ball.ballDiam, y + ball.ballDiam) != null
+				&& getElementAt(x + ball.ballDiam, y + ball.ballDiam) != paddle) {
+			bounceClip.play();
+			ball.setYVelocity(-ball.getYVelocity());
+			return getElementAt(x + ball.ballDiam, y + ball.ballDiam);
+		} else {
+			return null;
+		}
+	}
+	
+	
+	/* Instance variable for the paddle */
 	private GRect paddle = makeRect(PADDLE_WIDTH, PADDLE_HEIGHT);
 	
-	/* Instance variable */
-//	private GOval ball = makeBall(BALL_RADIUS);
+	/* Instance variable for the ball */
 	private BreakoutBall ball = new BreakoutBall(BALL_RADIUS);
 	
-	/* Instance variable */
+	/* Instance variable for a random number generator */
 	private RandomGenerator rgen = RandomGenerator.getInstance();
+	
+	/* Instance variable for audio clip */
+	AudioClip bounceClip = MediaTools.loadAudioClip("bounce.au");
 	
 
 	/* Mouse events */
-	/* From the book pg 204, add better citation later */
+	/* mouseDragged is adapted from Eric Roberts' text,
+	 * The Art and Science of Java, p.205
+	 */
 	/* NOTE THAT THE MOUSE MUST BE CLICKED TO BE DRAGGED */
 	public void mouseDragged(MouseEvent e) {
 		int x = e.getX();
@@ -180,6 +211,25 @@ public class Breakout extends GraphicsProgram {
 		if (x < minX) x = minX;
 		if (x > maxX) x = maxX;
 		paddle.move(x - paddle.getX(), 0);
+	}
+	
+	/**
+	 * Method: reset
+	 * Resets the ball for the Breakout game
+	 * @return void
+	 */
+	public void reset() {
+		remove(ball);
+		remove(paddle);
+		paddle.setFillColor(Color.BLACK);
+		paddle.setLocation(PADDLE_X_INIT, PADDLE_Y_INIT);
+		ball.setFillColor(Color.BLACK);
+		ball.setLocation(BALL_X_INIT, BALL_Y_INIT);
+		add(paddle);
+		add(ball);
+		ball.setYVelocity(3.0);
+		ball.setXVelocity(rgen.nextDouble(1.0, 3.0));
+		if (rgen.nextBoolean(0.5)) ball.setXVelocity(-ball.getXVelocity());
 	}
 
 /* Method: init() */
@@ -203,17 +253,38 @@ public class Breakout extends GraphicsProgram {
 /* Method: run() */
 /** Runs the Breakout program. */
 	public void run() {
+		int bricksLeft = NUM_BRICKS;
 		addMouseListeners();
+		GObject collider;
+		GLabel label = new GLabel("YOU LOST");
+		label.setFont("Times-72");
+		label.setLocation(
+			((WIDTH / 2) - (label.getWidth() / 2)),
+			((HEIGHT / 2) - label.getAscent())
+		);
 		// Play three times
 		for (int i = 0; i < NTURNS; i++) {
 			// Wait a couple of seconds for the player to get ready
 			pause(2000);
 			while (ball.getY() < HEIGHT) {
 				ball.moveBall(paddle);
+				collider = getCollidingObject(ball);
+				if (collider != null) {
+					remove(collider);
+					bricksLeft--;
+				}
+				if (bricksLeft == 0) {
+					label.setLabel("YOU WON!");
+					i = NTURNS;
+					add(label);
+					break;
+				}
+				
 			}
-			// Restart the game
-			init();
+			// Reset the game
+			reset();
 		}
+		add(label);
 	}
 
 }

@@ -1,4 +1,6 @@
+import java.applet.*;
 import acm.graphics.*;
+import acm.util.*;
 
 public class BreakoutBall extends GOval {
 	
@@ -11,7 +13,9 @@ public class BreakoutBall extends GOval {
 	
 	/* Instance variables */
 	private double vx, vy;
-	private int ballDiam = Breakout.BALL_RADIUS * 2;
+	public int ballDiam = Breakout.BALL_RADIUS * 2;
+	/* Instance variable for audio clip */
+	AudioClip bounceClip = MediaTools.loadAudioClip("bounce.au");
 	
 	
 	/**
@@ -103,11 +107,11 @@ public class BreakoutBall extends GOval {
 			(this.getY() + ballDiam) <= (paddle.getY() + paddle.getHeight()) &&
 			(this.getY() + ballDiam) >= paddle.getY()
 		);
-		boolean withinPaddle = (
+		boolean withinPaddleLength = (
 			(this.getX() >= paddle.getX()) &&
 			(this.getX() + ballDiam) <= (paddle.getX() + paddle.getWidth())
 		);
-		return (atPaddleTop && withinPaddle);
+		return (atPaddleTop && withinPaddleLength);
 	}
 	
 	
@@ -119,11 +123,18 @@ public class BreakoutBall extends GOval {
 	 */
 	public void moveBall(GRect paddle) {
 		// Check for wall bounces off wall
-		if (isAtLeftWall() || isAtRightWall()) this.vx = -this.vx; 
-		if(isAtTopWall()) vy = -vy;
+		if (isAtLeftWall() || isAtRightWall()) {
+			bounceClip.play();
+			this.vx = -this.vx; 
+		}
+		if(isAtTopWall()) {
+			bounceClip.play();
+			vy = -vy;
+		}
 		// Check if ball is at paddle
 		if(isAtPaddle(paddle)) {
-			this.vx = -this.vx;
+			//Reversing x is redundant and makes the game too predictable
+			bounceClip.play();
 			this.vy = -this.vy;
 		}
 		this.move(this.vx, this.vy);
