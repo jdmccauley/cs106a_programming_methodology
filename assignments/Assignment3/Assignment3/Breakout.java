@@ -203,8 +203,7 @@ public class Breakout extends GraphicsProgram {
 	/* mouseDragged is adapted from Eric Roberts' text,
 	 * The Art and Science of Java, p.205
 	 */
-	/* NOTE THAT THE MOUSE MUST BE CLICKED TO BE DRAGGED */
-	public void mouseDragged(MouseEvent e) {
+	public void mouseMoved(MouseEvent e) {
 		int x = e.getX();
 		int minX = 0;
 		int maxX = WIDTH - PADDLE_WIDTH;
