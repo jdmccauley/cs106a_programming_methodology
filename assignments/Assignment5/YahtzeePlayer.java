@@ -9,8 +9,8 @@ import java.util.*;
 
 public class YahtzeePlayer {
 	public YahtzeePlayer(String playerName) {
-		name = playerName;
-		total = 0;
+		this.name = playerName;
+		this.total = 0;
 	}
 	
 	/**

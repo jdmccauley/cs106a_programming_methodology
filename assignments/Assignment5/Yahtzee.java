@@ -23,6 +23,7 @@
  * 8. Allow for turns
  * 	Done
  * 9. Prevent user from clicking same category twice
+ * 10. Define Category rules and return values
  * Second get the dice roll to show up on the display.
  * 
  */
@@ -232,7 +233,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 			// Only move forward if category not selected before.
 			if (!players[player - 1].isInSelectedCategories(category)) {
 				players[player - 1].addSelectedCategory(category);
-				correct = YahtzeeMagicStub.checkCategory(roll, category);
+				score = scorer.checkCategory(roll, category);
 				// Break only if the category was unselected before.
 				break;
 			} else {
@@ -242,11 +243,11 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 				);
 			}
 		}
-		if (correct) {
-			score = 5;
-		} else {
-			score = 0;
-		}
+//		if (correct) {
+//			score = 5;
+//		} else {
+//			score = 0;
+//		}
 		display.updateScorecard(category, player, score);
 		// Update total.
 		players[player - 1].updateTotal(score);
@@ -259,6 +260,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	private YahtzeeDisplay display;
 	private RandomGenerator rgen = new RandomGenerator();
 	private YahtzeePlayer[] players;
+	private YahtzeeScorer scorer = new YahtzeeScorer();
 
 /* Constants */
 	private static final int N_TURNS = 13;
