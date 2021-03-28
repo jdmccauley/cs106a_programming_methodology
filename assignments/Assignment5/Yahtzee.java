@@ -226,7 +226,6 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		// Initialize variables.
 		int score = 0;
 		int category = 0;
-		boolean correct = false;
 		// Wait for the user to select a category, and assign category.
 		while (true) {
 			category = display.waitForPlayerToSelectCategory();
@@ -243,13 +242,9 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 				);
 			}
 		}
-//		if (correct) {
-//			score = 5;
-//		} else {
-//			score = 0;
-//		}
 		display.updateScorecard(category, player, score);
 		// Update total.
+		//TODO separate between upper and lower scores, only update total at end.
 		players[player - 1].updateTotal(score);
 		display.updateScorecard(TOTAL, player, players[player - 1].getTotal());
 	}
