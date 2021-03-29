@@ -26,7 +26,7 @@ public class YahtzeeScorer implements YahtzeeConstants {
 	 */
 	public int checkCategory(int[] roll, int category) {
 		// Convert the roll into an ArrayList for ease of use.
-		rollList = new ArrayList();
+		rollList = new ArrayList<Integer>();
 		for (int i = 0; i < roll.length; i++) {
 			rollList.add(roll[i]);
 		}
@@ -67,7 +67,7 @@ public class YahtzeeScorer implements YahtzeeConstants {
 				// FAILS
 				if (isContainingMultiple(rollList, 3)) {
 					score = sumDice(roll);
-				}
+				} else score = 0;
 				break;
 			
 			case FOUR_OF_A_KIND:
@@ -75,43 +75,17 @@ public class YahtzeeScorer implements YahtzeeConstants {
 				// FAILS
 				if (isContainingMultiple(rollList, 4)) {
 					score = sumDice(roll);
-				}
+				} else score = 0;
 				break;
 			
 			case FULL_HOUSE:
 				/* Contains three of a kind and two of a kind. */
-				// TODO this breaks.
-				ArrayList<Integer> shortList = new ArrayList();
-				ArrayList<Integer> longList = new ArrayList();
-				if (isContainingMultiple(rollList, 3)) {
-					// Sort ArrayList.
-					sortList(rollList);
-					if (rollList.get(2) < rollList.get(3)) {
-						for (int i = 0; i < 2; i++) {
-							shortList.add(rollList.get(i));
-						}
-						for (int i = 2; i < 5; i++) {
-							longList.add(rollList.get(i));
-						}
-					} else {
-						for (int i = 0; i < 3; i++) {
-							longList.add(rollList.get(i));
-						}
-						for (int i = 3; i < 5; i++) {
-							shortList.add(rollList.get(i));
-						}
-					}
-
-					// Then test if a two of a kind is in list.
-					if (
-						isContainingMultiple(shortList, 2) && 
-						isContainingMultiple(longList, 3)
-					) {
-						score = 25;
-					}
-				} else {
-					score = 0;
-				}
+				if (
+					isContainingMultiple(rollList, 3) && 
+					isContainingMultiple(rollList, 2)
+				) {
+					score = 25;
+				} else score = 0;
 				break;
 			
 			case SMALL_STRAIGHT:
@@ -149,7 +123,6 @@ public class YahtzeeScorer implements YahtzeeConstants {
 				score = 0;
 				break;
 		}
-		
 		return score;
 	}
 	
@@ -205,7 +178,7 @@ public class YahtzeeScorer implements YahtzeeConstants {
 	 * Method: isContainingMultiple
 	 * Takes a roll, a number of times to find value, and returns a boolean
 	 * of whether one value is found the given number of times in the roll.
-	 * @param ArrayList<Integer> rollList: ArrayList containing 5 Integers with
+	 * @param ArrayList<Integer> roll: ArrayList containing 5 Integers with
 	 * 	values from 1 to 6.
 	 * @param count: int of number of times to count the value in the roll.
 	 * @return boolean isContaining: boolean value of whether an integer is
@@ -216,20 +189,24 @@ public class YahtzeeScorer implements YahtzeeConstants {
 			int count
 	) {
 		boolean isContaining= false;
+		int toRemove = 0;
 		// Cycle through 1-6 to serve as value.
 		for (int i = 1; i < 7; i++) {
-			// Assign isContaining to be true if value in roll, until
-			// it is not.
+			/*
+			 * Assign isContaining to be true if value in roll, until
+			 * it is not. Remove values from ArrayList after testing.
+			 */
 			for (int j = 0; j < count; j++) {
 				if (rollList.contains(i)) {
 					isContaining = true;
-					if (j == count - 1) break;
+					toRemove = rollList.indexOf(i);
+					rollList.remove(toRemove);
+					if (j == count - 1) return isContaining;
 				} else {
 					isContaining = false;
 					break;
 				}
 			}
-			
 		}
 		
 		return isContaining;
@@ -238,17 +215,17 @@ public class YahtzeeScorer implements YahtzeeConstants {
 	/**
 	 * Method: countConsecutive
 	 * Takes a roll and counts how many consecutive values are in the roll.
-	 * @param ArrayList<Integer> roll: ArrayList having 5 Integers with values
+	 * @param ArrayList<Integer> rollList: ArrayList having 5 Integers with values
 	 * 	from 1 to 6.
 	 * @return int counter: int representing number of consecutive values in
 	 * 	the roll.
 	 */
-	private int countConsecutive(ArrayList<Integer> roll) {
+	private int countConsecutive(ArrayList<Integer> rollList) {
 		int count = 0;
 		for (int i = 1; i < 7; i++) {
-			if (roll.contains(i)) {
+			if (rollList.contains(i)) {
 				count++;
-				if (!roll.contains(i + 1)) {
+				if (!rollList.contains(i + 1)) {
 					break;
 				}
 			}
@@ -256,32 +233,9 @@ public class YahtzeeScorer implements YahtzeeConstants {
 		
 		return count;
 	}
-	
-	/**
-	 * Method: sortList
-	 * Takes a list of integers representing a dice roll for five dice, and
-	 * sorts the list by re-indexing the values in the list from smallest value
-	 * to largest value.
-	 * @param ArrayList<Integer> list: ArrayList containing 5 Integers with
-	 * 	values from 1 to 6.
-	 * @return None, the ArrayList is modified in place.
-	 */
-	private void sortList(ArrayList<Integer> list) {
-		int small = 0;
-		int large = 0;
-		for (int i = 0; i < list.size() - 1; i++) {
-			if (list.get(i) > list.get(i + 1)) {
-				large = list.get(i);
-				small = list.get(i + 1);
-				list.set(i, small);
-				list.set(i + 1, large);
-			}
-		}
-	}
-	
-	
+		
 	
 	/* Instance Variables */
-	private ArrayList<Integer> rollList;
 	private int score;
+	private ArrayList<Integer> rollList;
 }

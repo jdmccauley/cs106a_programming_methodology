@@ -39,9 +39,16 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	}
 	
 	public void run() {
-		IODialog dialog = getDialog();
+//		IODialog dialog = getDialog();
 //		nPlayers = dialog.readInt("Enter number of players");
 //		playerNames = new String[nPlayers];
+//		
+//
+//		playerNames[1] = "you";
+//		
+//		for (int i = 1; i <= nPlayers; i++) {
+//			playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
+//		}
 		
 		/*
 		 * Temporary for fast testing
@@ -51,33 +58,14 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		playerNames[0] = "me";
 		players = new YahtzeePlayer[nPlayers];
 		players[0] = new YahtzeePlayer(playerNames[0]);
-//		playerNames[1] = "you";
 		
-//		for (int i = 1; i <= nPlayers; i++) {
-//			playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
-//		}
 		display = new YahtzeeDisplay(getGCanvas(), playerNames);
 		playGame();
 	}
 
 	private void playGame() {
 		/* You fill this in */
-		
-		//Await until player clicks roll
-//		display.waitForPlayerToClickRoll(1);
-		//Once player clicks roll, then roll and display
-//		int[] roll = diceRoll();
-//		displayDice(roll);
-		//Now wait for player to select dice to reroll
-//		display.waitForPlayerToSelectDice();
-		//Check which dice were selected
-		//for dice in dice, return index if dice isSelected()
-		//roll dice for dice in diceToRoll when rollbutton is clicked
-//		display.waitForPlayerToSelectDice();
-		//do again for all dice
-		//roll again
-		// end turn
-		int score = 0;
+
 		int[] roll;
 		int turns = 0;
 		
@@ -85,11 +73,11 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 			display.printMessage(
 				players[0].getName() + "'s turn to roll!"
 			);
-			roll = rollPlayer(1);
+			roll = rollPlayer(0);
 			display.printMessage(
 				players[0].getName() + " select a category."
 			);
-			scorePlayer(1, roll);
+			scorePlayer(0, roll);
 			turns++;
 		}
 		display.printMessage(
@@ -97,10 +85,27 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 			", you won with a score of " +
 			players[0].getTotal() + "!"
 		);	
-	/*
-	 * TODO: ANNOTATE WHERE PLAYERS IS 1 VS 0 AND WHY
-	 */
 	}
+	
+	/**
+	 * TODO: Test
+	 * Current status: does not break on full house anymore!
+	 * Make sure each roll can get a zero for fail and calculate pass.
+	 * 20210328 test, one player:
+	 * Three of a kind passes when it should not.
+	 * Four of a kind passes when it should not.
+	 * Yahtzee passes when it should not.
+	 * Full house passes when it should not.
+	 * Straights and singles fail successfully.
+	 * Singles and straights work.
+	 * Full house can fail, why not consistent?
+	 * Three of a kind fails.
+	 */
+	
+	/*
+	 * Make a test class to make the scorer work without running
+	 * the actual program.
+	 */
 	
 
 	
@@ -151,31 +156,14 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		}
 	}
 	
-	/**
-	 * Method: printArrayInt
-	 * temp
-	 */
-	private void printArrayInt(int[] arr) {
-		for (int i = 0; i < arr.length; i++)
-			println(arr[i]);
-	}
-	
-	/**
-	 * Method: printArrayBool
-	 * temp
-	 */
-	private void printArrayBool(boolean[] arr) {
-		for (int i = 0; i < arr.length; i++)
-			println(arr[i]);
-	}
 	
 	/**
 	 * Method: rollPlayer
 	 * Handles user interaction and performs rolls necessary for a turn in
 	 * 	Yahtzee. Takes an int for the player index to roll. Returns the final
 	 * 	dice rolls in an int array.
-	 * @param int player: int representing the player index.
-	 * 	Note that the player index starts on 1 since the Display needs that.
+	 * @param int player: int representing the player index. Player indices
+	 * 	can be any number greater than or equal to zero.
 	 * @return int[] roll: int array of length N_DICE that has values from 1 to
 	 * 	6 for each element in the array.
 	 */
@@ -183,9 +171,13 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		// Initialize the roll and dice to roll.
 		int[] roll = new int[N_DICE];
 		boolean[] isRollNeeded = {true, true, true, true, true, true};
-		
-		// Once player clicks roll, do roll for all dice.
-		display.waitForPlayerToClickRoll(player);
+
+		/*
+		 * Once player clicks roll, do roll for all dice.
+		 * Note that the display methods need player + 1 since they
+		 * start with index 1.
+		 */
+		display.waitForPlayerToClickRoll(player + 1);
 		diceRoll(roll, isRollNeeded);
 		displayDice(roll);
 		// Un-select all dice for re-roll.
@@ -194,7 +186,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		// Let player re-roll two times.
 		for (int i = 0; i < 2; i++) {
 			display.printMessage(
-				playerNames[player - 1] + 
+				playerNames[player] + 
 				" select dice for reroll and select 'Roll Again'."
 			);
 			display.waitForPlayerToSelectDice();
@@ -217,7 +209,8 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	 * 	for the category based on the validity of the category with the roll.
 	 * 	The roll is asserted here, and if true, a score greater than 0 is
 	 * 	updated; otherwise the score for the category is assigned 0.
-	 * @param int player: int representing the player index.
+	 * @param int player: int representing the player index. Player indices
+	 * 	can be any number greater than or equal to zero.
 	 * @param int[] roll: int array representing the player's roll. 
 	 * 	Size of N_DICE.
 	 * @return void The player's total score are modified in place!
@@ -230,23 +223,28 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		while (true) {
 			category = display.waitForPlayerToSelectCategory();
 			// Only move forward if category not selected before.
-			if (!players[player - 1].isInSelectedCategories(category)) {
-				players[player - 1].addSelectedCategory(category);
+			if (!players[player].isInSelectedCategories(category)) {
+				players[player].addSelectedCategory(category);
 				score = scorer.checkCategory(roll, category);
 				// Break only if the category was unselected before.
 				break;
 			} else {
 				display.printMessage(
-					players[player - 1].getName() +
+					players[player].getName() +
 					" try again, that category was already selected."
 				);
 			}
 		}
-		display.updateScorecard(category, player, score);
+		// Display method needs player starting index of 1.
+		display.updateScorecard(category, player + 1, score);
 		// Update total.
 		//TODO separate between upper and lower scores, only update total at end.
-		players[player - 1].updateTotal(score);
-		display.updateScorecard(TOTAL, player, players[player - 1].getTotal());
+		players[player].updateTotal(score);
+		display.updateScorecard(
+			TOTAL, 
+			player + 1, 
+			players[player].getTotal()
+		);
 	}
 		
 /* Private instance variables */
