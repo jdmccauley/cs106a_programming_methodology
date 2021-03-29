@@ -64,7 +64,6 @@ public class YahtzeeScorer implements YahtzeeConstants {
 			
 			case THREE_OF_A_KIND:
 				/* Contains three of a kind. */
-				// FAILS
 				if (isContainingMultiple(rollList, 3)) {
 					score = sumDice(roll);
 				} else score = 0;
@@ -72,7 +71,6 @@ public class YahtzeeScorer implements YahtzeeConstants {
 			
 			case FOUR_OF_A_KIND:
 				/* Contains four of a kind. */
-				// FAILS
 				if (isContainingMultiple(rollList, 4)) {
 					score = sumDice(roll);
 				} else score = 0;
@@ -89,29 +87,24 @@ public class YahtzeeScorer implements YahtzeeConstants {
 				break;
 			
 			case SMALL_STRAIGHT:
-				// WORKS
+				/* Contains 4 consecutive values. */
 				if (countConsecutive(rollList) >= 4) {
 					score = 30;
-				} else {
-					score = 0;
-				}
+				} else score = 0;
 				break;
 			
 			case LARGE_STRAIGHT:
-				// MIGHT WORK
+				/* Contains 5 consecutive values. */
 				if (countConsecutive(rollList) >= 5) {
 					score = 40;
-				} else {
-					score = 0;
-				}
+				} else score = 0;
 				break;
 			
 			case YAHTZEE:
-				// FAILS
 				/* Contains 5 of a kind. */
 				if (isContainingMultiple(rollList, 5)) {
 					score = 50;
-				}
+				} else score = 0;
 				break;
 			
 			case CHANCE:
@@ -211,6 +204,7 @@ public class YahtzeeScorer implements YahtzeeConstants {
 		
 		return isContaining;
 	}
+	
 	
 	/**
 	 * Method: countConsecutive

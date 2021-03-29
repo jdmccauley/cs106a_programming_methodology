@@ -1,36 +1,13 @@
 /*
  * File: Yahtzee.java
  * ------------------
- * This program will eventually play the Yahtzee game.
- */
-
-/*
- * Plan:
- * 1. Roll dice and store values
- * 	Done
- * 2. Display dice and let them be rerolled with 'roll again' button
- * 	Done
- * 3. Let dice be selected for reroll, and reroll
- * 	Done
- * 4. Let categories be selected for assertion against dice roll
- * 	Done
- * 5. Assert dice roll against categories with YahtzeeMagicStub.checkCategory()
- * 	Done
- * 6. Display and store 0 if not pass, value if pass.
- * 	Done
- * 7. Have Total reflect total
- * 	Done
- * 8. Allow for turns
- * 	Done
- * 9. Prevent user from clicking same category twice
- * 10. Define Category rules and return values
- * Second get the dice roll to show up on the display.
- * 
+ * This program plays the Yahtzee game.
  */
 
 import acm.io.*;
 import acm.program.*;
 import acm.util.*;
+import java.util.*;
 
 public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	
@@ -38,78 +15,86 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		new Yahtzee().start(args);
 	}
 	
+	/**
+	 * Method: initCategories
+	 * Initializes an array for category tracking.
+	 * @param None.
+	 * @return void.
+	 */
+	private void initCategories() {
+		for (int i = 0; i < upperCategories.length; i++) {
+			uppers.add(upperCategories[i]);
+		}
+		for (int i = 0; i < lowerCategories.length; i++) {
+			lowers.add(lowerCategories[i]);
+		}
+	}
+	
 	public void run() {
-//		IODialog dialog = getDialog();
-//		nPlayers = dialog.readInt("Enter number of players");
-//		playerNames = new String[nPlayers];
-//		
-//
-//		playerNames[1] = "you";
-//		
-//		for (int i = 1; i <= nPlayers; i++) {
-//			playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
-//		}
+		// Get number of players, and names.
+		IODialog dialog = getDialog();
+		nPlayers = dialog.readInt("Enter number of players");
+		playerNames = new String[nPlayers];		
+		for (int i = 1; i <= nPlayers; i++) {
+			playerNames[i - 1] = dialog.readLine("Enter name for player " + i);
+		}
 		
-		/*
-		 * Temporary for fast testing
-		 */
-		nPlayers = 1;
-		playerNames = new String[nPlayers];
-		playerNames[0] = "me";
+		//Make players.
 		players = new YahtzeePlayer[nPlayers];
-		players[0] = new YahtzeePlayer(playerNames[0]);
+		for (int i = 0; i < nPlayers; i++) {
+			players[i] = new YahtzeePlayer(playerNames[i]);
+		}
 		
+		// Play game.
 		display = new YahtzeeDisplay(getGCanvas(), playerNames);
 		playGame();
 	}
 
 	private void playGame() {
-		/* You fill this in */
-
-		int[] roll;
+		// Initialize values.
 		int turns = 0;
+		int winner;
+		initCategories();
 		
+		// Do turns for all players.
 		while (turns < N_TURNS) {
-			display.printMessage(
-				players[0].getName() + "'s turn to roll!"
-			);
-			roll = rollPlayer(0);
-			display.printMessage(
-				players[0].getName() + " select a category."
-			);
-			scorePlayer(0, roll);
+			for (int i = 0; i < nPlayers; i++) {
+				doTurn(i);
+			}
 			turns++;
 		}
+		
+		// Finalize scores for all players.
+		for (int i = 0; i < nPlayers; i++) {
+			finalizeScores(i);
+		}
+		winner = determineWinner();
+		
 		display.printMessage(
-			players[0].getName() + 
+			players[winner].getName() + 
 			", you won with a score of " +
-			players[0].getTotal() + "!"
-		);	
+			players[winner].getTotal() + "!"
+		);
 	}
 	
 	/**
-	 * TODO: Test
-	 * Current status: does not break on full house anymore!
-	 * Make sure each roll can get a zero for fail and calculate pass.
-	 * 20210328 test, one player:
-	 * Three of a kind passes when it should not.
-	 * Four of a kind passes when it should not.
-	 * Yahtzee passes when it should not.
-	 * Full house passes when it should not.
-	 * Straights and singles fail successfully.
-	 * Singles and straights work.
-	 * Full house can fail, why not consistent?
-	 * Three of a kind fails.
+	 * Method: doTurn
+	 * Runs a turn for a player.
+	 * @param int player: int representing the player.
+	 * @return void
 	 */
-	
-	/*
-	 * Make a test class to make the scorer work without running
-	 * the actual program.
-	 */
+	private void doTurn(int player) {
+		display.printMessage(
+			players[player].getName() + "'s turn to roll!"
+		);
+		roll = rollPlayer(player);
+		display.printMessage(
+			players[player].getName() + " select a category."
+		);
+		scorePlayer(player, roll);
+	}
 	
 
-	
-	
 	/**
 	 * Method: diceRoll
 	 * Takes an integer array of size N_DICE and uses a pseudorandrom number
@@ -133,6 +118,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		}
 	}
 	
+	
 	/**
 	 * Method: displayDice
 	 * Displays a dice roll to the display.
@@ -143,6 +129,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 	private void displayDice(int[] roll) {
 		display.displayDice(roll);
 	}
+	
 	
 	/**
 	 * Method: clearDiceStatus
@@ -202,6 +189,7 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		return roll;
 	}
 	
+	
 	/**
 	 * Method: scorePlayer
 	 * Handles user interaction and handles player scoring for a given roll.
@@ -237,8 +225,16 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 		}
 		// Display method needs player starting index of 1.
 		display.updateScorecard(category, player + 1, score);
+		
+		//Update upper or lower score.
+		if (uppers.contains(category)) {
+			players[player].updateUpperScore(score);
+		}
+		if (lowers.contains(category)) {
+			players[player].updateLowerScore(score);
+		}
+		
 		// Update total.
-		//TODO separate between upper and lower scores, only update total at end.
 		players[player].updateTotal(score);
 		display.updateScorecard(
 			TOTAL, 
@@ -246,14 +242,90 @@ public class Yahtzee extends GraphicsProgram implements YahtzeeConstants {
 			players[player].getTotal()
 		);
 	}
+	
+	
+	/**
+	 * Method: finalizeScores
+	 * Adds the upper and lower scores to the board, and changes the player's
+	 * 	total score with the upper bonus.
+	 * @param int player: int representing the player.
+	 * @return void
+	 */
+	private void finalizeScores(int player) {
+		// Display scores.
+		display.updateScorecard(
+			UPPER_SCORE,
+			player + 1,
+			players[player].getUpperScore()
+		);
+		display.updateScorecard(
+			UPPER_BONUS,
+			player + 1,
+			players[player].getUpperBonus()
+		);
+		display.updateScorecard(
+			LOWER_SCORE,
+			player + 1,
+			players[player].getLowerScore()
+		);
+		// Update total score and display it.
+		players[player].updateTotal(
+			players[player].getUpperBonus()
+		);
+		display.updateScorecard(
+			TOTAL,
+			player + 1,
+			players[player].getTotal()
+		);
+		
+	}
+	
+	
+	/**
+	 * Method: determineWinner
+	 * Returns the index of the player who has the highest score.
+	 * @param None.
+	 * @return int winner: int index of player with highest total score.
+	 */
+	private int determineWinner() {
+		// Initialize winner.
+		int winner = 0;
+		for (int i = 0; i < nPlayers; i++) {
+			if (players[i].getTotal() > players[winner].getTotal() ) {
+				winner = i;
+			}
+		}
+		return winner;
+	}
+	
 		
 /* Private instance variables */
 	private int nPlayers;
+	private int[] roll = new int[N_DICE];
 	private String[] playerNames;
 	private YahtzeeDisplay display;
 	private RandomGenerator rgen = new RandomGenerator();
 	private YahtzeePlayer[] players;
 	private YahtzeeScorer scorer = new YahtzeeScorer();
+	private int[] upperCategories = {
+		ONES, 
+		TWOS, 
+		THREES, 
+		FOURS, 
+		FIVES, 
+		SIXES
+	};
+	private int[] lowerCategories = {
+		THREE_OF_A_KIND, 
+		FOUR_OF_A_KIND, 
+		FULL_HOUSE, 
+		SMALL_STRAIGHT, 
+		LARGE_STRAIGHT, 
+		YAHTZEE, 
+		CHANCE
+	};
+	private ArrayList<Integer> uppers = new ArrayList<Integer>();
+	private ArrayList<Integer> lowers = new ArrayList<Integer>();
 
 /* Constants */
 	private static final int N_TURNS = 13;

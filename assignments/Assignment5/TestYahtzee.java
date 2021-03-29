@@ -55,6 +55,5 @@ public class TestYahtzee extends ConsoleProgram implements YahtzeeConstants {
 	
 	/* Instance variables. */
 	private ArrayList<Integer> roll;
-	private YahtzeePlayer players[];
 	private YahtzeeScorer scorer = new YahtzeeScorer();
 }
