@@ -42,6 +42,7 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 * and initializing the interactors at the bottom of the window.
 	 */
 	public void init() {
+		// Make interactors.
 		nameLabel = new JLabel("Name:");
 		nameField = new JTextField(NAME_MAX);
 		graphButton = new JButton("Graph");
@@ -52,6 +53,9 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	    add(clearButton, SOUTH);
 	    addActionListeners();
 	    nameField.addActionListener(this);
+	    
+	    // Add database.
+	    database = new NameSurferDataBase("names-data.txt");
 	}
 
 
@@ -60,7 +64,8 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 * This method runs the program.
 	 */
 	public void run() {
-
+		println("Welcome to NameSurfer!");
+		println("Enter a name and 'Graph' to see the name data.");
 	}
 
 	/* Method: actionPerformed(e) */
@@ -80,7 +85,8 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 * This method performs the action for the Graph button.
 	 */
 	public void doGraph() {
-		println("Graph: " + nameField.getText());
+		userInput = nameField.getText();
+		println("Graph: " + database.findEntry(userInput).toString());
 	}
 	
 	/* Method: doClear */
@@ -96,6 +102,8 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	private JTextField nameField;
 	private JButton graphButton;
 	private JButton clearButton;
+	private NameSurferDataBase database;
+	private String userInput;
 	
 	/* Constants */
 	private static final int NAME_MAX = 20;

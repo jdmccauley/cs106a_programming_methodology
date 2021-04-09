@@ -17,6 +17,7 @@ public class NameSurferEntry implements NameSurferConstants {
 	 * in the data file.  Each line begins with the name, which is
 	 * followed by integers giving the rank of that name for each
 	 * decade.
+	 * @return NameSurferEntry
 	 */
 	public NameSurferEntry(String line) {
 		// The line is read from a reader.
@@ -88,6 +89,8 @@ public class NameSurferEntry implements NameSurferConstants {
 	 * decades have passed since the first year in the database,
 	 * which is given by the constant START_DECADE.  If a name does
 	 * not appear in a decade, the rank value is 0.
+	 * @param decade: Int representing decade past 1900.
+	 * @return rank: Int frequency of name in the decade.
 	 */
 	public int getRank(int decade) {
 		return this.ranks.get(YEARS[decade]);
@@ -97,6 +100,7 @@ public class NameSurferEntry implements NameSurferConstants {
 	/**
 	 * Returns a string that makes it easy to see the value of a
 	 * NameSurferEntry.
+	 * @return total: String representation of entry.
 	 */
 	public String toString() {
 		// You need to turn this stub into a real implementation //
