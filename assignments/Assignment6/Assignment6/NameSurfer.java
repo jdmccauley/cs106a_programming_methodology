@@ -33,8 +33,7 @@ import acm.program.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-//public class NameSurfer extends Program implements NameSurferConstants {
-public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
+public class NameSurfer extends Program implements NameSurferConstants {
 
 	/* Method: init() */
 	/**
@@ -51,11 +50,17 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	    add(nameField, SOUTH);
 	    add(graphButton, SOUTH);
 	    add(clearButton, SOUTH);
+	    
+	    // Add action listeners.
 	    addActionListeners();
 	    nameField.addActionListener(this);
 	    
 	    // Add database.
 	    database = new NameSurferDataBase("names-data.txt");
+	    
+	    // Add graphics.
+	    graph = new NameSurferGraph(this);
+	    add(graph, CENTER);
 	}
 
 
@@ -64,8 +69,8 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 * This method runs the program.
 	 */
 	public void run() {
-		println("Welcome to NameSurfer!");
-		println("Enter a name and 'Graph' to see the name data.");
+//		println("Welcome to NameSurfer!");
+//		println("Enter a name and 'Graph' to see the name data.");
 	}
 
 	/* Method: actionPerformed(e) */
@@ -86,7 +91,8 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 */
 	public void doGraph() {
 		userInput = nameField.getText();
-		println("Graph: " + database.findEntry(userInput).toString());
+		graph.update();
+//		println("Graph: " + database.findEntry(userInput).toString());
 	}
 	
 	/* Method: doClear */
@@ -94,16 +100,20 @@ public class NameSurfer extends ConsoleProgram implements NameSurferConstants {
 	 * This method clears the console.
 	 */
 	public void doClear() {
-		println("Clear");
+		graph.clear();
 	}
 	
 	/* Instance Variables */
+	// Interactors.
 	private JLabel nameLabel;
 	private JTextField nameField;
 	private JButton graphButton;
 	private JButton clearButton;
+	// Data structures.
 	private NameSurferDataBase database;
 	private String userInput;
+	// Graphics.
+	private NameSurferGraph graph;
 	
 	/* Constants */
 	private static final int NAME_MAX = 20;

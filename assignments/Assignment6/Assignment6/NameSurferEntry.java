@@ -127,10 +127,5 @@ public class NameSurferEntry implements NameSurferConstants {
 	
 	/* Constants. */
 	private static final int N_SPACES = 11;
-	private static final int[] YEARS = {
-		1900, 1910, 1920, 1930, 1940, 1950,
-		1960, 1970, 1980, 1990, 2000
-	};
-	
 }
 
