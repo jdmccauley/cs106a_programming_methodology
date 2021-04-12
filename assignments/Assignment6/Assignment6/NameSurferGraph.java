@@ -10,16 +10,10 @@ import acm.graphics.*;
 import java.awt.event.*;
 import java.util.*;
 import java.awt.*;
-
 import acm.program.*;
 
 public class NameSurferGraph extends GCanvas
 	implements NameSurferConstants, ComponentListener {
-	
-	/*
-	 * TODO
-	 * Add entry graphing, and clearing.
-	 */
 
 	/**
 	* Creates a new NameSurferGraph object that displays the data.
@@ -29,6 +23,9 @@ public class NameSurferGraph extends GCanvas
 		addComponentListener(this);
 		//	 You fill in the rest //
 		mainProgram = program;
+		entries = new ArrayList<NameSurferEntry>();
+		colors = COLORS;
+		colorIterator = 0;
 		init();
 	}
 	
@@ -36,9 +33,7 @@ public class NameSurferGraph extends GCanvas
 	* Clears the list of name surfer entries stored inside this class.
 	*/
 	public void clear() {
-		//	 You fill this in //
-		
-		
+		entries.clear();	
 	}
 	
 	/* Method: addEntry(entry) */
@@ -46,11 +41,11 @@ public class NameSurferGraph extends GCanvas
 	* Adds a new NameSurferEntry to the list of entries on the display.
 	* Note that this method does not actually draw the graph, but
 	* simply stores the entry; the graph is drawn by calling update.
+	* @param entry: NameSurferEntry to add to the display.
 	*/
 	public void addEntry(NameSurferEntry entry) {
-		// You fill this in //
+		entries.add(entry);
 	}
-	
 	
 	
 	/**
@@ -60,13 +55,16 @@ public class NameSurferGraph extends GCanvas
 	* calling either clear or addEntry; update is also called whenever
 	* the size of the canvas changes.
 	*/
-	public void update() {
-		//	 You fill this in //
-		
+	public void update() {		
 		// Remove graph and make a new one.
 		clearGraph();
 		init();
+		// Reset the colorIterator, otherwise each update assigns new color
+		// to already plotted names.
+		colorIterator = 0;
+		plotEntries();
 	}
+	
 	
 	/**
 	 * Clears the display.
@@ -74,6 +72,7 @@ public class NameSurferGraph extends GCanvas
 	private void clearGraph() {
 		this.removeAll();
 	}
+	
 	
 	/**
 	 * Create the display.
@@ -96,7 +95,11 @@ public class NameSurferGraph extends GCanvas
 		
 		// Make and add years.
 		addYears();
+		
+		// Initialize lengthPerRank.
+		initLengthPerRank();
 	}
+	
 	
 	/**
 	 * Initializes the offset for a label, and returns the value.
@@ -108,6 +111,7 @@ public class NameSurferGraph extends GCanvas
 		GLabel tmpLabel = new GLabel(tmpYear.toString());
 		return (int) tmpLabel.getAscent();
 	}
+	
 	
 	/**
 	 * Initialize graph height and width with the program height and width.
@@ -121,8 +125,9 @@ public class NameSurferGraph extends GCanvas
 		lineSpace = graphWidthMax / N_SPACES;
 	}
 	
+	
 	/**
-	 * Makes and adds horizonal lines to canvas.
+	 * Makes and adds horizontal lines to canvas.
 	 * @param offset: Offset for horizontal line.
 	 */
 	private void addHorizontalLines(int offset) {
@@ -138,12 +143,13 @@ public class NameSurferGraph extends GCanvas
 			graphWidthMin, graphHeightMax - offset - BOTTOM_OFFSET,
 			graphWidthMax, graphHeightMax - offset - BOTTOM_OFFSET
 		);
-		horizontalLines[0] = topLine;
-		horizontalLines[1] = bottomLine;
+		horizontalLines[TOP_LINE] = topLine;
+		horizontalLines[BOTTOM_LINE] = bottomLine;
 		for (int i = 0; i < horizontalLines.length; i++) {
 			add(horizontalLines[i]);
 		}
 	}
+	
 	
 	/**
 	 * Uses the horizontalLines array from the horizontal line addition and
@@ -159,6 +165,7 @@ public class NameSurferGraph extends GCanvas
 		return horizontalLinesY;
 	}
 	
+	
 	/**
 	 * Makes and adds vertical lines to canvas.
 	 */
@@ -173,13 +180,8 @@ public class NameSurferGraph extends GCanvas
 				lineLocation, graphHeightMax
 			);
 			lineLocation += lineSpace;
-		}
-		
-		// Add lines to graph.
-		for (int i = 0; i < verticalLines.length; i++) {
 			this.add(verticalLines[i]);
-		}
-		
+		}		
 	}
 	
 	
@@ -197,6 +199,7 @@ public class NameSurferGraph extends GCanvas
 		return verticalLinesX;
 	}
 	
+	
 	/**
 	 * Uses the verticalLines array from the vertical line addition and returns an int
 	 * array of Y positions for each of the lines' endpoint.
@@ -210,6 +213,7 @@ public class NameSurferGraph extends GCanvas
 		}
 		return verticalLinesY;
 	}
+	
 	
 	/**
 	 * Adds list of years to graph next to the vertical lines representing the
@@ -230,7 +234,6 @@ public class NameSurferGraph extends GCanvas
 			labelAscent = yearsLabels[i].getAscent();
 			yearsLabels[i].setLocation(
 				verticalLinesX[i] + YEAR_OFFSET,
-//				horizontalLinesY[1] + labelAscent
 				verticalLinesY[i]
 			);			
 		}
@@ -241,10 +244,113 @@ public class NameSurferGraph extends GCanvas
 		}
 	}
 	
-
+	
+	/**
+	 * Initializes the length per rank on graph.
+	 */
+	private void initLengthPerRank() {
+		double horizontalRange = (
+			horizontalLines[BOTTOM_LINE].getEndPoint().getY() - 
+			horizontalLines[TOP_LINE].getEndPoint().getY()
+		);
+		lengthPerRank = horizontalRange / MAX_RANK;
+	}
+	
+	
+	/**
+	 * Graphs an entry.
+	 * @param entry: NameSurferEntry to graph.
+	 */
+	private void graphEntry(NameSurferEntry entry) {
+		// Initialize local variables. May not be necessary.
+		String entryName = entry.getName();
+		int[] yearData = new int[YEARS.length];
+		for (int i = 0; i < yearData.length; i++) {
+			yearData[i] = entry.getRank(i);
+		}
+		double position = 0;
+		Color lineColor = nextColor();
+		// Make list of points per entry.
+		GPoint[] entryPoints = new GPoint[YEARS.length];
+		for (int i = 0; i < entryPoints.length; i ++) {
+			if (yearData[i] == MAX_RANK || yearData[i] == 0) {
+				position = horizontalLinesY[BOTTOM_LINE];
+			} else {
+				position = (
+					horizontalLinesY[TOP_LINE] +
+					(yearData[i] * lengthPerRank)
+				);
+			}
+			entryPoints[i] = new GPoint(
+				(double) verticalLinesX[i],
+				position
+			);
+		}
+		// Make lines between points and add them to the canvas.
+		GLine[] entryLines = new GLine[entryPoints.length - 1];
+		for (int i = 0; i < entryLines.length; i++) {
+			entryLines[i] = new GLine(
+				entryPoints[i].getX(),
+				entryPoints[i].getY(),
+				entryPoints[i + 1].getX(),
+				entryPoints[i + 1].getY()
+			);
+			entryLines[i].setColor(lineColor);
+			this.add(entryLines[i]);
+		}
+		// Make data per point and add it to the canvas.
+		GLabel[] entryLabels = new GLabel[entryPoints.length];
+		double labelAscent = 0;
+		for (int i = 0; i < entryLabels.length; i++) {
+			entryLabels[i] = new GLabel(
+					entry.getName() + " " + yearData[i]
+			);
+			if (yearData[i] == 0) {
+				entryLabels[i].setLabel(
+					entry.getName() + "*"
+				);
+			}
+			labelAscent = entryLabels[i].getAscent();
+			entryLabels[i].setLocation(
+				entryPoints[i].getX(),// + LABEL_OFFSET,
+				entryPoints[i].getY() - labelAscent
+			);
+			entryLabels[i].setColor(lineColor);
+			this.add(entryLabels[i]);
+		}
+	}
+	
+	
+	/**
+	 * Plots the entries.
+	 */
+	private void plotEntries() {
+		for (int i = 0; i < entries.size(); i++) {
+			graphEntry(entries.get(i));
+		}
+	}
+	
+	
+	/**
+	 * Returns a color within COLORS at index colorIterator. The colorIterator
+	 * is then iterated unless is it is at value 3, by which it is set to zero.
+	 * @return nextColor: Color within COLORS at index colorIterator.
+	 */
+	private Color nextColor() {
+		Color nextColor = colors[colorIterator];
+		if (colorIterator < 3) {
+			colorIterator++;
+		} else {
+			colorIterator = 0;
+		}
+		return nextColor;
+	}
+	
 	
 	/* Instance variables. */
+	// Program.
 	private Program mainProgram;
+	// Graphics variables.
 	private int graphHeightMax;
 	private int graphHeightMin;
 	private int graphWidthMax;
@@ -257,6 +363,12 @@ public class NameSurferGraph extends GCanvas
 	private int[] verticalLinesY;
 	private GLabel[] yearsLabels;
 	private Integer[] yearInts;
+	private double lengthPerRank;
+	private Color[] colors;
+	private int colorIterator;
+	// Entry variables.
+	private ArrayList<NameSurferEntry> entries;
+	
 	
 	/* Constants. */
 	/** Offset for graphics from bottom of GCanvas. */
@@ -267,7 +379,14 @@ public class NameSurferGraph extends GCanvas
 	private static final int N_HORIZONTAL_LINES = 2;
 	/** Number spaces in graph. */
 	private static final int N_SPACES = 11;
-	
+	/** Enumeration for horizontal lines. */
+	private static final int TOP_LINE = 0;
+	private static final int BOTTOM_LINE = 1;
+	/** Color set. */
+	private static final Color[] COLORS = {
+			Color.BLACK, Color.RED,
+			Color.BLUE, Color.MAGENTA
+	};
 	
 	
 	/* Implementation of the ComponentListener interface */

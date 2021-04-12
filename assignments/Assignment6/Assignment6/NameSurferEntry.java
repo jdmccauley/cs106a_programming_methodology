@@ -96,6 +96,7 @@ public class NameSurferEntry implements NameSurferConstants {
 		return this.ranks.get(YEARS[decade]);
 	}
 
+	
 	/* Method: toString() */
 	/**
 	 * Returns a string that makes it easy to see the value of a
@@ -117,13 +118,12 @@ public class NameSurferEntry implements NameSurferConstants {
 		return total;
 	}
 	
+	
 	/* Instance variables. */
 	private String name;
 	private int[] spaceLocations;
 	private HashMap<Integer, Integer> ranks;
 	
-	// There are 12 values per name: 1 name and 11 values
-	// This has 11 spaces then
 	
 	/* Constants. */
 	private static final int N_SPACES = 11;
