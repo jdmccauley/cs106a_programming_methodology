@@ -9,6 +9,9 @@
  * and "ERIC" are the same names.
  */
 
+import java.util.*;
+import java.io.*;
+
 public class NameSurferDataBase implements NameSurferConstants {
 	
 /* Constructor: NameSurferDataBase(filename) */
@@ -17,9 +20,23 @@ public class NameSurferDataBase implements NameSurferConstants {
  * data in the specified file.  The constructor throws an error
  * exception if the requested file does not exist or if an error
  * occurs as the file is being read.
+ * @param filename: String representing filename.
+ * @return NameSurferDatabase
  */
 	public NameSurferDataBase(String filename) {
-		// You fill this in //
+		database = new HashMap<String, NameSurferEntry>();
+		String line = "";
+		try {
+			rd = new BufferedReader(new FileReader(filename));
+			while (true) {
+				line = rd.readLine();
+				if (line == null) break;
+				holderEntry = new NameSurferEntry(line);
+				database.put(holderEntry.getName(), holderEntry);
+			}
+		} catch (IOException e) {
+			throw new Error(e);
+		}
 	}
 	
 /* Method: findEntry(name) */
@@ -27,10 +44,16 @@ public class NameSurferDataBase implements NameSurferConstants {
  * Returns the NameSurferEntry associated with this name, if one
  * exists.  If the name does not appear in the database, this
  * method returns null.
+ * @param name: String of a name to search for in the database.
+ * @return entry: NameSurferEntry for the given name, otherwise null.
  */
 	public NameSurferEntry findEntry(String name) {
-		// You need to turn this stub into a real implementation //
-		return null;
+		return database.get(name);
 	}
+	
+	/* Instance variables. */
+	private HashMap<String, NameSurferEntry> database;
+	private BufferedReader rd;
+	private NameSurferEntry holderEntry;
 }
 

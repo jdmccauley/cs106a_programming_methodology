@@ -33,7 +33,8 @@ import acm.program.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class NameSurfer extends Program implements NameSurferConstants {
+//public class NameSurfer extends Program implements NameSurferConstants {
+public class NameSurferConsole extends ConsoleProgram implements NameSurferConstants {
 
 	/* Method: init() */
 	/**
@@ -50,17 +51,12 @@ public class NameSurfer extends Program implements NameSurferConstants {
 	    add(nameField, SOUTH);
 	    add(graphButton, SOUTH);
 	    add(clearButton, SOUTH);
-	    
 	    // Add action listeners.
 	    addActionListeners();
 	    nameField.addActionListener(this);
 	    
 	    // Add database.
 	    database = new NameSurferDataBase("names-data.txt");
-	    
-	    // Add graphics.
-	    graph = new NameSurferGraph(this);
-	    add(graph, CENTER);
 	}
 
 
@@ -69,10 +65,10 @@ public class NameSurfer extends Program implements NameSurferConstants {
 	 * This method runs the program.
 	 */
 	public void run() {
-		
+		println("Welcome to NameSurfer!");
+		println("Enter a name and 'Graph' to see the name data.");
 	}
 
-	
 	/* Method: actionPerformed(e) */
 	/**
 	 * This class is responsible for detecting when the buttons are
@@ -85,28 +81,22 @@ public class NameSurfer extends Program implements NameSurferConstants {
 		if (cmd.equals("Clear")) doClear();
 	}
 	
-	
 	/* Method: doGraph */
 	/**
 	 * This method performs the action for the Graph button.
 	 */
 	public void doGraph() {
 		userInput = nameField.getText();
-		entry = database.findEntry(userInput);
-		graph.addEntry(entry);
-		graph.update();
+		println("Graph: " + database.findEntry(userInput).toString());
 	}
-	
 	
 	/* Method: doClear */
 	/**
 	 * This method clears the console.
 	 */
 	public void doClear() {
-		graph.clear();
-		graph.update();
+		println("Clear");
 	}
-	
 	
 	/* Instance Variables */
 	// Interactors.
@@ -117,7 +107,6 @@ public class NameSurfer extends Program implements NameSurferConstants {
 	// Data structures.
 	private NameSurferDataBase database;
 	private String userInput;
-	private NameSurferEntry entry;
 	// Graphics.
 	private NameSurferGraph graph;
 	

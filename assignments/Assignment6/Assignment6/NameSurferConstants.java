@@ -28,5 +28,11 @@ public interface NameSurferConstants {
 
 /** The number of pixels to reserve at the top and bottom */
 	public static final int GRAPH_MARGIN_SIZE = 20;
+	
+/** List of years that the file has data for. */
+	public static final int[] YEARS = {
+			1900, 1910, 1920, 1930, 1940, 1950,
+			1960, 1970, 1980, 1990, 2000
+	};
 
 }
