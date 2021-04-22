@@ -17,13 +17,13 @@ import javax.swing.*;
  * North: Name, Add, Delete, Lookup
  */
 
-public class FacePamphlet extends Program 
+public class FacePamphletConsole extends ConsoleProgram 
 					implements FacePamphletConstants {
 	/**
 	 * Temp main, written by Josh.
 	 */
 	public static void main(String[] args) {
-		new FacePamphlet().start(args);	
+		new FacePamphletConsole().start(args);	
 	}
 
 	/**
