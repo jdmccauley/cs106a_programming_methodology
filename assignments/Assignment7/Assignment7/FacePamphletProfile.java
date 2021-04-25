@@ -9,6 +9,7 @@
  */
 
 import acm.graphics.*;
+import acm.util.*;
 import java.util.*;
 
 public class FacePamphletProfile implements FacePamphletConstants {
@@ -51,10 +52,16 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	}
 
 	/** This method sets the image associated with the profile.
-	 * @param image: GImage to set the profile's profile picture.
+	 * @param image: String name to set the profile's profile picture.
 	 */ 
-	public void setImage(GImage image) {
-		this.profilePicture = image;
+	public void setImage(String image) {
+		// Try to set the image with the image.
+		try {
+			this.profilePicture.setImage(image);
+		} catch (ErrorException e) {
+			// Throw error if not valid image path.
+			throw new ErrorException(e);
+		}
 	}
 	
 	/** 

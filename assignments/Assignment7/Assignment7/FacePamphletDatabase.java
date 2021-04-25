@@ -57,6 +57,10 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 		if (containsProfile(name)) {
 			this.db.remove(name);
 		}
+		// Remove profile from all profiles' friends list.
+		for (String profile: db.keySet()) {
+			this.db.get(profile).removeFriend(name);
+		}
 	}
 
 	
@@ -67,6 +71,11 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	public boolean containsProfile(String name) {
 		return this.db.containsKey(name);
 	}
+	
+	/* Private methods to help public methods. */
+	/**
+	 * Returns an iterator for all profiles in the database.
+	 */
 		
 	
 	/* Instance variables. */

@@ -38,7 +38,6 @@ public class FacePamphletConsole extends ConsoleProgram
 	/**
 	 * Makes the interactors and adds them to the application.
 	 */
-	
 	private void initInteractors() {
 		// Initialize interactors.
 		// West
@@ -72,30 +71,87 @@ public class FacePamphletConsole extends ConsoleProgram
     	if (cmd == "Add") this.addName();
     	if (cmd == "Delete") this.deleteName();
     	if (cmd == "Lookup") this.lookupName();
+    	// Print current profile.
+    	if (this.currentProfile != null) {
+    		println("--> Current Profile: " + this.currentProfile.toString());
+    	} else {
+    		println("--> No current profile");
+    	}
+    	
 	}
     
     /**
      * Changes status for the current profile.
      */
     private void changeStatus() {
+    	// Get the status.
     	String status = this.statusField.getText();
-    	println("Change Status: " + status);
+    	// Make sure current profile is not null.
+    	if (this.currentProfile != null) {
+    		// If not, make status change.
+    		this.currentProfile.setStatus(status);
+    		println("Status updated to " + status);
+    	} else {
+    		// Else tell user to select a profile.
+    		println(
+    			"No current profile set. " + 
+    			"Please select a profile by " +
+    			"adding a new one or looking one up."
+    		);
+    	}
     }
     
     /**
      * Changes the picture for the current profile.
      */
     private void changePicture() {
+    	// Get the picture.
     	String picture = this.pictureField.getText();
-    	println("Change picture: " + picture);
+    	// Make sure current profile is not null.
+    	if (this.currentProfile != null) {
+    		// If not, make the picture change.
+    		this.currentProfile.setImage(picture);
+    		println("Picture updated to: " + picture);
+    	} else {
+    		// Else tell user to select a profile.
+    		println(
+        		"No current profile set. " + 
+        		"Please select a profile by " +
+        		"adding a new one or looking one up."
+        	);
+    	}
     }
     
     /**
      * Adds a friend to the current profile.
      */
     private void addFriend() {
+    	// Get the friend.
     	String friend = this.friendField.getText();
-    	println("Add Friend: " + friend);
+    	// Make sure friend is valid profile.
+    	if (this.db.containsProfile(friend)) {
+    		// Make sure the current profile is not null.
+    		if (this.currentProfile != null) {
+    			// If not, make the friend addition.
+    			this.currentProfile.addFriend(friend);
+    			println(friend + " added as a friend");
+    			// Now add current profile to friends' list of friends.
+    			this.db.getProfile(friend).addFriend(
+    				this.currentProfile.getName()
+    			);
+    		} else {
+    			// Else tell user to select profile.
+    			println(
+    					"No current profile set. " + 
+    					"Please select a profile by " +
+    					"adding a new one or looking one up."
+    			);
+    		}
+    	} else {
+    		// else tell user profile is not valid.
+    		println("Cannot add friend, friend is not a valid profile.");
+    	}
+
     }
     
     /**
@@ -116,9 +172,12 @@ public class FacePamphletConsole extends ConsoleProgram
     	} else {
     		FacePamphletProfile profile = new FacePamphletProfile(name);
     		this.db.addProfile(profile);
+    		// Set current profile to the added profile.
+    		this.currentProfile = this.db.getProfile(name);
+    		// Print the current profile.
     		println(
     			"Add: new profile: " + 
-    			this.db.getProfile(name).toString()
+    			this.currentProfile.toString()
     		);
     	}
     }
@@ -134,6 +193,8 @@ public class FacePamphletConsole extends ConsoleProgram
     		FacePamphletProfile profile = this.db.getProfile(name);
     		// Then delete the profile.
     		this.db.deleteProfile(name);
+    		// Remove the current profile.
+    		this.currentProfile = null;
     		// And print the profile name deleted.
     		println("Delete: profile of " + profile.getName() + " deleted");
     	} else {
@@ -153,9 +214,10 @@ public class FacePamphletConsole extends ConsoleProgram
     	String name = this.nameField.getText();
     	// Check if the profile first exists. If so, get the profile.
     	if (this.db.containsProfile(name)) {
-    		FacePamphletProfile profile = this.db.getProfile(name);
+    		// Set currentProfile as the profile.
+    		this.currentProfile = this.db.getProfile(name);
     		// Then print the profile.
-    		println("Lookup: " + profile.toString());
+    		println("Lookup: " + this.currentProfile.toString());
     	} else {
     		// Print that the profile does not exist.
     		println(
@@ -181,5 +243,7 @@ public class FacePamphletConsole extends ConsoleProgram
     private JButton lookupName;
     // Database.
     private FacePamphletDatabase db;
+    // Current profile.
+    private FacePamphletProfile currentProfile;
 
 }
