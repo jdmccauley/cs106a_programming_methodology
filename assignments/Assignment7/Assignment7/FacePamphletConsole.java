@@ -12,9 +12,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /*
- * Milestone 1: Make the interactors do things.
- * West: Status, Picture, Friend
- * North: Name, Add, Delete, Lookup
+ * Milestone 3 status: Complete and passing. Add to main FacePamphlet.
  */
 
 public class FacePamphletConsole extends ConsoleProgram 
@@ -34,6 +32,7 @@ public class FacePamphletConsole extends ConsoleProgram
 	public void init() {
 		initInteractors();
 		addActionListeners();
+		db = new FacePamphletDatabase();
     }
 	
 	/**
@@ -100,42 +99,87 @@ public class FacePamphletConsole extends ConsoleProgram
     }
     
     /**
-     * Adds a profile for the given name.
+     * Adds a profile for the given name. 
      */
     private void addName() {
+    	// Get the name.
     	String name = this.nameField.getText();
-    	println("Add: " + name);
+    	// If the profile already exists for the name,
+    	// print profile.toString().
+    	if (this.db.containsProfile(name)) {
+    		println(
+    			"Add: profile for " + name + " already exists: " +
+    			this.db.getProfile(name).toString()
+    		);
+    		// Else, make profile, add to database,
+    		// and print profile.toString()
+    	} else {
+    		FacePamphletProfile profile = new FacePamphletProfile(name);
+    		this.db.addProfile(profile);
+    		println(
+    			"Add: new profile: " + 
+    			this.db.getProfile(name).toString()
+    		);
+    	}
     }
     
     /**
      * Deletes a profile of the given name.
      */
     private void deleteName() {
+    	// Get the name.
     	String name = this.nameField.getText();
-    	println("Delete: " + name);
+    	// Check if profile first exists. If so, get the profile.
+    	if (this.db.containsProfile(name)) {
+    		FacePamphletProfile profile = this.db.getProfile(name);
+    		// Then delete the profile.
+    		this.db.deleteProfile(name);
+    		// And print the profile name deleted.
+    		println("Delete: profile of " + profile.getName() + " deleted");
+    	} else {
+    		// Otherwise print that the profile does not exist.
+    		println(
+    			"Delete: profile with the name " + name + 
+    			" does not exist"
+    		);
+    	}
     }
     
     /**
      * Looks up a profile for the given name.
      */
     private void lookupName() {
+    	// Get the name.
     	String name = this.nameField.getText();
-    	println("Lookup: " + name);
+    	// Check if the profile first exists. If so, get the profile.
+    	if (this.db.containsProfile(name)) {
+    		FacePamphletProfile profile = this.db.getProfile(name);
+    		// Then print the profile.
+    		println("Lookup: " + profile.toString());
+    	} else {
+    		// Print that the profile does not exist.
+    		println(
+    			"Lookup: profile with the name " + name +
+    			" does not exist"
+    		);
+    	}
     }
     
     /* Instance variables. */
-    // West
+    // West Interactors.
     private JTextField statusField;
     private JButton changeStatus;
     private JTextField pictureField;
     private JButton changePicture;
     private JTextField friendField;
     private JButton addFriend;
-    // North
+    // North Interactors.
     private JLabel nameLabel;
     private JTextField nameField;
     private JButton addName;
     private JButton deleteName;
     private JButton lookupName;
+    // Database.
+    private FacePamphletDatabase db;
 
 }
