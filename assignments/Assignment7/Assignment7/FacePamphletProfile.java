@@ -19,42 +19,59 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * the profile.
 	 */
 	public FacePamphletProfile(String name) {
-		// You fill this in
+		// Assign name of profile to the name.
+		this.name = name;
+		// Assign default values to other properties.
+		this.status = "";
+		this.profilePicture = new GImage("");
+		this.friends = new ArrayList<String>();
 	}
 
-	/** This method returns the name associated with the profile. */ 
+	/** This method returns the name associated with the profile.
+	 * @return name: String representing the name of the profile. 
+	 */ 
 	public String getName() {
-		// You fill this in.  Currently always returns the empty string.
-		return "";
+		return this.name;
 	}
 
 	/** 
 	 * This method returns the image associated with the profile.  
 	 * If there is no image associated with the profile, the method
-	 * returns null. */ 
+	 * returns null.
+	 * @return profilePicture: GImage of the profile's picture. Null if there
+	 * 	is not a valid profile picture.
+	 */ 
 	public GImage getImage() {
-		// You fill this in.  Currently always returns null.
-		return null;
+		// Return image if not empty.
+		if (this.profilePicture.getImage() != null) {
+			return this.profilePicture;
+		} else {
+			return null;
+		}
 	}
 
-	/** This method sets the image associated with the profile. */ 
+	/** This method sets the image associated with the profile.
+	 * @param image: GImage to set the profile's profile picture.
+	 */ 
 	public void setImage(GImage image) {
-		// You fill this in
+		this.profilePicture = image;
 	}
 	
 	/** 
 	 * This method returns the status associated with the profile.
 	 * If there is no status associated with the profile, the method
 	 * returns the empty string ("").
+	 * @return status: String representing the profile's status.
 	 */ 
 	public String getStatus() {
-		// You fill this in.  Currently always returns the empty string.
-		return "";
+		return this.status;
 	}
 	
-	/** This method sets the status associated with the profile. */ 
+	/** This method sets the status associated with the profile.
+	 * @param status: String representing the profile's status.
+	 */ 
 	public void setStatus(String status) {
-		// You fill this in
+		this.status = status;
 	}
 
 	/** 
@@ -65,10 +82,18 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * was already in the list of friends for this profile (in which 
 	 * case, the given friend name is not added to the list of friends 
 	 * a second time.)
+	 * @param friend: String representing a name of a friend to add.
+	 * @return true if added, false it not added.
 	 */
 	public boolean addFriend(String friend) {
-		// You fill this in.  Currently always returns true.
-		return true;
+		// Add friend if friend not in friends, then return true.
+		// Otherwise return false and do not add friend.
+		if (!friends.contains(friend)) {
+			friends.add(friend);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/** 
@@ -78,19 +103,27 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * the list).  The method returns false if the given friend name 
 	 * was not in the list of friends for this profile (in which case,
 	 * the given friend name could not be removed.)
+	 * @param friend: String representing a name of a friend to remove.
+	 * @return true if deleted, false if not deleted.
 	 */
 	public boolean removeFriend(String friend) {
-		// You fill this in.  Currently always returns false.
-		return false;
+		// Return true if friend exists, and remove the friend.
+		// Otherwise return false and do nothing
+		if (friends.contains(friend)) {
+			friends.remove(friend);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/** 
 	 * This method returns an iterator over the list of friends 
 	 * associated with the profile.
+	 * @return iterator: Iterator over the ArrayList<String> of friends.
 	 */ 
 	public Iterator<String> getFriends() {
-		// You fill this in.  Currently always returns null.
-		return null;
+		return this.friends.iterator();
 	}
 	
 	/** 
@@ -105,8 +138,25 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * would return the string: "Alice (coding): Don, Chelsea, Bob"
 	 */ 
 	public String toString() {
-		// You fill this in.  Currently always returns the empty string.
-		return "";
+		// Make string with name and status.
+		String total = this.name + "(" + this.status + "): ";
+		// Get friends iterator.
+		Iterator<String> friends = this.getFriends();
+		// Add friends to string.
+		while (friends.hasNext()) {
+			total += friends.next();
+			// If not last friend, add comma to string.
+			if (friends.hasNext()) {
+				total += ", ";
+			}
+		}
+		return total;
 	}
+	
+	/* Instance variables. */
+	private String name;
+	private String status;
+	private GImage profilePicture;
+	private ArrayList<String> friends;
 	
 }
