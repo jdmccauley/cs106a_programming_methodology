@@ -7,7 +7,6 @@
  */
 
 import java.util.*;
-import acm.util.*;
 
 public class FacePamphletDatabase implements FacePamphletConstants {
 
@@ -17,7 +16,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	 * the database.
 	 */
 	public FacePamphletDatabase() {
-		db = new HashMap<String, FacePamphletProfile>();
+		this.db = new HashMap<String, FacePamphletProfile>();
 	}
 	
 

@@ -11,6 +11,7 @@
 import acm.graphics.*;
 import acm.util.*;
 import java.util.*;
+import java.awt.*;
 
 public class FacePamphletProfile implements FacePamphletConstants {
 	
@@ -24,7 +25,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		this.name = name;
 		// Assign default values to other properties.
 		this.status = "";
-		this.profilePicture = new GImage("");
+		this.profilePicture = null;
 		this.friends = new ArrayList<String>();
 	}
 
@@ -42,10 +43,10 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 * @return profilePicture: GImage of the profile's picture. Null if there
 	 * 	is not a valid profile picture.
 	 */ 
-	public GImage getImage() {
+	public Image getImage() {
 		// Return image if not empty.
-		if (this.profilePicture.getImage() != null) {
-			return this.profilePicture;
+		if (this.profilePicture != null) {
+			return this.profilePicture.getImage();
 		} else {
 			return null;
 		}
@@ -57,7 +58,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	public void setImage(String image) {
 		// Try to set the image with the image.
 		try {
-			this.profilePicture.setImage(image);
+			this.profilePicture = new GImage(image);
 		} catch (ErrorException e) {
 			// Throw error if not valid image path.
 			throw new ErrorException(e);
@@ -131,6 +132,20 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	 */ 
 	public Iterator<String> getFriends() {
 		return this.friends.iterator();
+	}
+	
+	/**
+	 * This method returns the number of friends the profile has.
+	 * @return nFriends: Int number of friends associated with the profile.
+	 */
+	public int getNumberFriends() {
+		int nFriends = 0;
+		Iterator<String> it = this.getFriends();
+		while (it.hasNext()) {
+			nFriends += 1;
+			it.next();
+		}
+		return nFriends;
 	}
 	
 	/** 

@@ -32,7 +32,9 @@ public class FacePamphlet extends Program
 	public void init() {
 		initInteractors();
 		addActionListeners();
-		db = new FacePamphletDatabase();
+		this.db = new FacePamphletDatabase();
+		this.canvas = new FacePamphletCanvas();
+		this.add(this.canvas);
     }
 	
 	/**
@@ -42,18 +44,18 @@ public class FacePamphlet extends Program
 	private void initInteractors() {
 		// Initialize interactors.
 		// West
-		add(statusField = new JTextField(TEXT_FIELD_SIZE), WEST);
-		add(changeStatus = new JButton("Change Status"), WEST);
-		add(pictureField = new JTextField(TEXT_FIELD_SIZE), WEST);
-		add(changePicture = new JButton("Change Picture"), WEST);
-		add(friendField = new JTextField(TEXT_FIELD_SIZE), WEST);
-		add(addFriend = new JButton("Add Friend"), WEST);
+		this.add(statusField = new JTextField(TEXT_FIELD_SIZE), WEST);
+		this.add(changeStatus = new JButton("Change Status"), WEST);
+		this.add(pictureField = new JTextField(TEXT_FIELD_SIZE), WEST);
+		this.add(changePicture = new JButton("Change Picture"), WEST);
+		this.add(friendField = new JTextField(TEXT_FIELD_SIZE), WEST);
+		this.add(addFriend = new JButton("Add Friend"), WEST);
 		// North
-		add(nameLabel = new JLabel("Name"), NORTH);
-		add(nameField = new JTextField(TEXT_FIELD_SIZE), NORTH);
-		add(addName = new JButton("Add"), NORTH);
-		add(deleteName = new JButton("Delete"), NORTH);
-		add(lookupName = new JButton("Lookup"), NORTH);
+		this.add(nameLabel = new JLabel("Name"), NORTH);
+		this.add(nameField = new JTextField(TEXT_FIELD_SIZE), NORTH);
+		this.add(addName = new JButton("Add"), NORTH);
+		this.add(deleteName = new JButton("Delete"), NORTH);
+		this.add(lookupName = new JButton("Lookup"), NORTH);
 		
 	}
     
@@ -72,12 +74,15 @@ public class FacePamphlet extends Program
     	if (cmd == "Add") this.addName();
     	if (cmd == "Delete") this.deleteName();
     	if (cmd == "Lookup") this.lookupName();
-    	// Print current profile.
+    	// If profile null, clear canvas.
     	if (this.currentProfile != null) {
-    		println("--> Current Profile: " + this.currentProfile.toString());
+    		this.canvas.displayProfile(this.currentProfile);
     	} else {
-    		println("--> No current profile");
+    		// Clear canvas if deleted.
+    		this.canvas.removeAll();
+    		this.canvas.showMessage("No valid profile selected.");
     	}
+    	
 	}
     
     /**
@@ -90,10 +95,10 @@ public class FacePamphlet extends Program
     	if (this.currentProfile != null) {
     		// If not, make status change.
     		this.currentProfile.setStatus(status);
-    		println("Status updated to " + status);
+    		this.canvas.showMessage("Status updated to " + status);
     	} else {
     		// Else tell user to select a profile.
-    		println(
+    		this.canvas.showMessage(
     			"No current profile set. " + 
     			"Please select a profile by " +
     			"adding a new one or looking one up."
@@ -111,10 +116,10 @@ public class FacePamphlet extends Program
     	if (this.currentProfile != null) {
     		// If not, make the picture change.
     		this.currentProfile.setImage(picture);
-    		println("Picture updated to: " + picture);
+    		this.canvas.showMessage("Picture updated to: " + picture);
     	} else {
     		// Else tell user to select a profile.
-    		println(
+    		this.canvas.showMessage(
         		"No current profile set. " + 
         		"Please select a profile by " +
         		"adding a new one or looking one up."
@@ -134,14 +139,14 @@ public class FacePamphlet extends Program
     		if (this.currentProfile != null) {
     			// If not, make the friend addition.
     			this.currentProfile.addFriend(friend);
-    			println(friend + " added as a friend");
+    			this.canvas.showMessage(friend + " added as a friend");
     			// Now add current profile to friends' list of friends.
     			this.db.getProfile(friend).addFriend(
     				this.currentProfile.getName()
     			);
     		} else {
     			// Else tell user to select profile.
-    			println(
+    			this.canvas.showMessage(
     					"No current profile set. " + 
     					"Please select a profile by " +
     					"adding a new one or looking one up."
@@ -149,7 +154,9 @@ public class FacePamphlet extends Program
     		}
     	} else {
     		// else tell user profile is not valid.
-    		println("Cannot add friend, friend is not a valid profile.");
+    		this.canvas.showMessage(
+    			"Cannot add friend, friend is not a valid profile."
+    		);
     	}
     }
     
@@ -167,7 +174,7 @@ public class FacePamphlet extends Program
     	// If the profile already exists for the name,
     	// print profile.toString().
     	if (this.db.containsProfile(name)) {
-    		println(
+    		this.canvas.showMessage(
     			"Add: profile for " + name + " already exists: " +
     			this.db.getProfile(name).toString()
     		);
@@ -179,7 +186,7 @@ public class FacePamphlet extends Program
     		// Set current profile to the added profile.
     		this.currentProfile = this.db.getProfile(name);
     		// Print the current profile.
-    		println(
+    		this.canvas.showMessage(
     			"Add: new profile: " + 
     			this.currentProfile.toString()
     		);
@@ -200,10 +207,13 @@ public class FacePamphlet extends Program
     		// Remove the current profile.
     		this.currentProfile = null;
     		// And print the profile name deleted.
-    		println("Delete: profile of " + profile.getName() + " deleted");
+    		this.canvas.showMessage(
+    			"Delete: profile of " + 
+    			profile.getName() + " deleted"
+    		);
     	} else {
     		// Otherwise print that the profile does not exist.
-    		println(
+    		this.canvas.showMessage(
     			"Delete: profile with the name " + name + 
     			" does not exist"
     		);
@@ -221,10 +231,12 @@ public class FacePamphlet extends Program
     		// Set currentProfile as the profile.
     		this.currentProfile = this.db.getProfile(name);
     		// Then print the profile.
-    		println("Lookup: " + this.currentProfile.toString());
+    		this.canvas.showMessage(
+    			"Lookup: " + this.currentProfile.toString()
+    		);
     	} else {
     		// Print that the profile does not exist.
-    		println(
+    		this.canvas.showMessage(
     			"Lookup: profile with the name " + name +
     			" does not exist"
     		);
@@ -249,5 +261,7 @@ public class FacePamphlet extends Program
     private FacePamphletDatabase db;
     // Current profile.
     private FacePamphletProfile currentProfile;
+    // Canvas.
+    private FacePamphletCanvas canvas;
 
 }
