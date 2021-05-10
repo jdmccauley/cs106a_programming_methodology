@@ -1,7 +1,7 @@
 /* 
  * File: FacePamphlet.java
  * -----------------------
- * When it is finished, this program will implement a basic social network
+ * This program implements a basic social network
  * management system.
  */
 
@@ -11,19 +11,9 @@ import acm.util.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-/*
- * TODO: Implement add, delete, and lookup in console, then add here if pass.
- */
 
 public class FacePamphlet extends Program 
 					implements FacePamphletConstants {
-	/**
-	 * Temp main, written by Josh.
-	 */
-	public static void main(String[] args) {
-		new FacePamphlet().start(args);	
-	}
-
 	/**
 	 * This method has the responsibility for initializing the 
 	 * interactors in the application, and taking care of any other 
@@ -37,10 +27,10 @@ public class FacePamphlet extends Program
 		this.add(this.canvas);
     }
 	
+	
 	/**
 	 * Makes the interactors and adds them to the application.
 	 */
-	
 	private void initInteractors() {
 		// Initialize interactors.
 		// West
@@ -64,6 +54,7 @@ public class FacePamphlet extends Program
      * This class is responsible for detecting when the buttons are
      * clicked or interactors are used, so you will have to add code
      * to respond to these actions.
+     * @param e: ActionEvent retrieved from the ActionListener.
      */
     public void actionPerformed(ActionEvent e) {
 		// You fill this in as well as add any additional methods
@@ -79,11 +70,11 @@ public class FacePamphlet extends Program
     		this.canvas.displayProfile(this.currentProfile);
     	} else {
     		// Clear canvas if deleted.
-    		this.canvas.removeAll();
-    		this.canvas.showMessage("No valid profile selected.");
+    		this.canvas.clearAllButMessage();
     	}
     	
 	}
+    
     
     /**
      * Changes status for the current profile.
@@ -106,6 +97,7 @@ public class FacePamphlet extends Program
     	}
     }
     
+    
     /**
      * Changes the picture for the current profile.
      */
@@ -126,6 +118,7 @@ public class FacePamphlet extends Program
         	);
     	}
     }
+    
     
     /**
      * Adds a friend to the current profile.
@@ -160,9 +153,7 @@ public class FacePamphlet extends Program
     	}
     }
     
-    /**
-     * Adds a profile for the given name.
-     */
+    
 	/*
 	 * If the profile name already exists in the database, 
 	 * then it prints out the fact that the profile with that name already 
@@ -175,8 +166,7 @@ public class FacePamphlet extends Program
     	// print profile.toString().
     	if (this.db.containsProfile(name)) {
     		this.canvas.showMessage(
-    			"Add: profile for " + name + " already exists: " +
-    			this.db.getProfile(name).toString()
+    			"A profile with the name " + name + " already exists"
     		);
     		// Else, make profile, add to database,
     		// and print profile.toString()
@@ -187,11 +177,11 @@ public class FacePamphlet extends Program
     		this.currentProfile = this.db.getProfile(name);
     		// Print the current profile.
     		this.canvas.showMessage(
-    			"Add: new profile: " + 
-    			this.currentProfile.toString()
+    			"New profile created"
     		);
     	}
     }
+    
     
     /**
      * Deletes a profile of the given name.
@@ -208,17 +198,18 @@ public class FacePamphlet extends Program
     		this.currentProfile = null;
     		// And print the profile name deleted.
     		this.canvas.showMessage(
-    			"Delete: profile of " + 
+    			"Profile of " + 
     			profile.getName() + " deleted"
     		);
     	} else {
     		// Otherwise print that the profile does not exist.
     		this.canvas.showMessage(
-    			"Delete: profile with the name " + name + 
+    			"A profile with the name " + name + 
     			" does not exist"
     		);
     	}
     }
+    
     
     /**
      * Looks up a profile for the given name.
@@ -232,16 +223,17 @@ public class FacePamphlet extends Program
     		this.currentProfile = this.db.getProfile(name);
     		// Then print the profile.
     		this.canvas.showMessage(
-    			"Lookup: " + this.currentProfile.toString()
+    			"Displaying " + this.currentProfile.getName()
     		);
     	} else {
     		// Print that the profile does not exist.
     		this.canvas.showMessage(
-    			"Lookup: profile with the name " + name +
+    			"A profile with the name " + name +
     			" does not exist"
     		);
     	}
     }
+    
     
     /* Instance variables. */
     // West Interactors.

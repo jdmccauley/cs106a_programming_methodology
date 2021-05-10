@@ -28,6 +28,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		this.profilePicture = null;
 		this.friends = new ArrayList<String>();
 	}
+	
 
 	/** This method returns the name associated with the profile.
 	 * @return name: String representing the name of the profile. 
@@ -36,6 +37,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		return this.name;
 	}
 
+	
 	/** 
 	 * This method returns the image associated with the profile.  
 	 * If there is no image associated with the profile, the method
@@ -52,6 +54,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		}
 	}
 
+	
 	/** This method sets the image associated with the profile.
 	 * @param image: String name to set the profile's profile picture.
 	 */ 
@@ -75,12 +78,14 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		return this.status;
 	}
 	
+	
 	/** This method sets the status associated with the profile.
 	 * @param status: String representing the profile's status.
 	 */ 
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
 
 	/** 
 	 * This method adds the named friend to this profile's list of 
@@ -103,6 +108,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 			return false;
 		}
 	}
+	
 
 	/** 
 	 * This method removes the named friend from this profile's list
@@ -124,6 +130,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 			return false;
 		}
 	}
+	
 
 	/** 
 	 * This method returns an iterator over the list of friends 
@@ -133,6 +140,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 	public Iterator<String> getFriends() {
 		return this.friends.iterator();
 	}
+	
 	
 	/**
 	 * This method returns the number of friends the profile has.
@@ -147,6 +155,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		}
 		return nFriends;
 	}
+	
 	
 	/** 
 	 * This method returns a string representation of the profile.  
@@ -174,6 +183,7 @@ public class FacePamphletProfile implements FacePamphletConstants {
 		}
 		return total;
 	}
+	
 	
 	/* Instance variables. */
 	private String name;

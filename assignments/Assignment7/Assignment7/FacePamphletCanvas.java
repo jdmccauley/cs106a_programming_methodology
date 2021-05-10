@@ -44,6 +44,7 @@ public class FacePamphletCanvas extends GCanvas
 		this.name.setColor(Color.BLUE);
 	}
 	
+	
 	/**
 	 * Initializes the image instance variable.
 	 */
@@ -112,6 +113,7 @@ public class FacePamphletCanvas extends GCanvas
 	 * canvas.  Every time this method is called, the previously 
 	 * displayed message (if any) is replaced by the new message text 
 	 * passed in.
+	 * @param msg: String to show in the message GLabel.
 	 */
 	public void showMessage(String msg) {
 		// Remove old label.
@@ -129,6 +131,22 @@ public class FacePamphletCanvas extends GCanvas
 	}
 	
 	
+	/**
+	 * Clears all GObjects from the canvas except the message.
+	 */
+	public void clearAllButMessage() {
+		// Clear canvas of all but message.
+		this.remove(this.imageHolder);
+		this.remove(this.name);
+		this.remove(this.image);
+		this.remove(this.status);
+		this.remove(this.friendsHeader);
+		for (int i = 0; i < this.friends.size(); i++) {
+			this.remove(this.friends.get(i));
+		}
+	}
+	
+	
 	/** 
 	 * This method displays the given profile on the canvas.  The 
 	 * canvas is first cleared of all existing items (including 
@@ -137,10 +155,11 @@ public class FacePamphletCanvas extends GCanvas
 	 * name of the user from the profile, the corresponding image 
 	 * (or an indication that an image does not exist), the status of
 	 * the user, and a list of the user's friends in the social network.
+	 * @param profile: FacePamphletProfile to display.
 	 */
 	public void displayProfile(FacePamphletProfile profile) {
-		// Clear canvas.
-		this.removeAll();
+		// Clear the canvas except the message.
+		this.clearAllButMessage();
 		// Add name
 		this.addName(profile);
 		// Add image.
@@ -155,6 +174,7 @@ public class FacePamphletCanvas extends GCanvas
 
 	/**
 	 * Aligns the name text for a given name and adds it.
+	 * @param profile: FacePamphletProfile to add to the canvas.
 	 */
 	private void addName(FacePamphletProfile profile) {
 		// Set name.
@@ -168,8 +188,10 @@ public class FacePamphletCanvas extends GCanvas
 		this.add(this.name);
 	}
 	
+	
 	/**
 	 * Scales a profile image to the correct size and adds it.
+	 * @param profile: FacePamphletProfile to add the profile image to.
 	 */
 	private void addImage(FacePamphletProfile profile) {
 		// Set both image and imageholder locations.
@@ -198,8 +220,10 @@ public class FacePamphletCanvas extends GCanvas
 		
 	}
 	
+	
 	/**
 	 * Adds the status to the canvas.
+	 * @param profile: FacePamphletProfile to display the status of.
 	 */
 	private void addStatus(FacePamphletProfile profile) {
 		// Set the status text.
@@ -266,8 +290,6 @@ public class FacePamphletCanvas extends GCanvas
 		}
 	}
 	
-	/* Helper methods. */
-
 	
 	/* Instance variables. */
 	private GLabel message;

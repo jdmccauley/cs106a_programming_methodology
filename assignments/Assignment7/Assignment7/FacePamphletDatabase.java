@@ -20,8 +20,6 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	}
 	
 
-	
-	
 	/** 
 	 * This method adds the given profile to the database.  If the 
 	 * name associated with the profile is the same as an existing 
@@ -70,12 +68,7 @@ public class FacePamphletDatabase implements FacePamphletConstants {
 	public boolean containsProfile(String name) {
 		return this.db.containsKey(name);
 	}
-	
-	/* Private methods to help public methods. */
-	/**
-	 * Returns an iterator for all profiles in the database.
-	 */
-		
+
 	
 	/* Instance variables. */
 	HashMap<String, FacePamphletProfile> db;
